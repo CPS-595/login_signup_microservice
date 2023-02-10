@@ -1,25 +1,48 @@
+require('dotenv').config();
 const express = require('express')
 const app = express()
 var port = process.env.PORT || 8081;
-const http = require('http').Server(app).listen(port)
+const verifyJWT = require('./middleware/verifyJWT');
+const cookieParser = require('cookie-parser');
+const credentials = require('./middleware/credentials');
+const corsOptions = require('./config/corsOptions');
+const mongoose = require('mongoose');
+const connectDB = require('./config/dbConn');
+
+connectDB();
+
+// const http = require('http').Server(app).listen(port, () => {
+//     console.log(`Server running on port ${port}`)
+// })
+
 const cors = require('cors')
-app.use(cors())
-app.use(express.static('static'))
+app.use(credentials);
+
+// Cross Origin Resource Sharing
+app.use(cors(corsOptions));
+// app.use(cors())
+// app.use(express.static('static'))
 app.use(express.urlencoded({extended:false}))
+// built-in middleware for json 
+app.use(express.json());
+
+//middleware for cookies
+app.use(cookieParser());
+
 const MongoClient = require('mongodb').MongoClient;
 // var bodyParser = require('body-parser')
 // var jsonParser = bodyParser.json();
 
 // MongoDB url which allows connection to be established with our application
-const mongourl = "mongodb+srv://karniko1:karniko1@cps-595-p1.n8rfp91.mongodb.net/CPS595-Project?retryWrites=true&w=majority";
+// const mongourl = "mongodb+srv://karniko1:karniko1@cps-595-p1.n8rfp91.mongodb.net/CPS595-Project?retryWrites=true&w=majority";
 
-const dbClient = new MongoClient(mongourl,
-                    {useNewUrlParser: true, useUnifiedTopology: true});
+// const dbClient = new MongoClient(mongourl,
+//                     {useNewUrlParser: true, useUnifiedTopology: true});
 
-dbClient.connect(err => {
-    if (err) throw err;
-    console.log("Connected to the MongoDB cluster!");
-});
+// dbClient.connect(err => {
+//     if (err) throw err;
+//     console.log("Connected to the MongoDB cluster!");
+// });
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -182,3 +205,16 @@ function isValid_Mobile_Number(mobile_number) {
     return regex.test(mobile_number);
     
 }
+
+app.use('/register', require('./routes/register'));
+app.use('/auth', require('./routes/auth'));
+app.use('/refresh', require('./routes/refresh'));
+app.use('/logout', require('./routes/logout'));
+
+app.use(verifyJWT);
+app.use('/users', require('./routes/users'));
+
+mongoose.connection.once('open', () => {
+    console.log('Connected to MongoDB');
+    app.listen(port, () => console.log(`Server running on port ${port}`));
+});
