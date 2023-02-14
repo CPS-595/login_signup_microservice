@@ -13,16 +13,12 @@ const handleLogin = async (req, res) => {
     if (match) {
         // create JWTs
         const accessToken = jwt.sign(
-            {
-                "UserInfo": {
-                    "email": foundUser.email,
-                }
-            },
+            { "email": foundUser.email},
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '10h' }
         );
         const refreshToken = jwt.sign(
-            { "username": foundUser.email },
+            { "email": foundUser.email },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );
@@ -35,7 +31,7 @@ const handleLogin = async (req, res) => {
         res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
 
         // Send authorization roles and access token to user
-        res.json({status: 'success', accessToken, user: foundUser });
+        res.json({status: 'Success', accessToken, user: foundUser });
 
     } else {
         res.status(401).json({status: 'Failed', message: 'User not Found'});

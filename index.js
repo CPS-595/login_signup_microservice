@@ -212,6 +212,7 @@ app.use('/refresh', require('./routes/refresh'));
 app.use('/logout', require('./routes/logout'));
 
 app.use(verifyJWT);
+app.use('/resources', require('./routes/resources'));
 app.use('/users', require('./routes/users'));
 
 mongoose.connection.once('open', () => {
