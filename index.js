@@ -206,6 +206,11 @@ function isValid_Mobile_Number(mobile_number) {
     
 }
 
+app.get("/echo", (req,res)=> {
+    console.log("in echo")
+    return res.send({message: "response received from server"})
+})
+
 app.use('/register', require('./routes/register'));
 app.use('/auth', require('./routes/auth'));
 app.use('/refresh', require('./routes/refresh'));
