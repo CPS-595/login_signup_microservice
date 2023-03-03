@@ -113,6 +113,34 @@ app.post("/login", (req,res)=>{
     
 })
 
+app.post("/addpassword", (req,res)=>{
+    console.log("inside add password",req.body)
+    var checkData = checklogindata(req.body)
+    if (checkData.status =="passed"){
+        console.log('in login', req.body)
+        const db = dbClient.db();
+        db.collection("users").findOne({email: req.body.email, password: req.body.password}, (err, userdata) => {
+            console.log(userdata,"Userdata")
+            if (err){
+                return res.send({message:"Error in Microservice !",status: "authentication-failed"})
+            }
+            if  (userdata){
+                console.log(userdata);
+                return res.send({userdata:userdata, status : "authenticated"});
+                console.log(userdata)
+            }
+            else {
+                return res.send({message:"User Not Found !",status: "authentication-failed"})
+            }
+        });
+        }
+        else{
+            return res.send({message:checkData.message,status:"authentication-failed"})
+    
+        }
+    
+})
+
 app.post("/signup", (req,res)=>{
     var checkData = checkuserdata(req.body)
     if (checkData.status =="passed"){

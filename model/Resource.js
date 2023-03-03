@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const resourceSchema = new Schema({
-    password: {
-        type: String,
-        required: true
-    },
     name: {
         type: String,
         required: true
