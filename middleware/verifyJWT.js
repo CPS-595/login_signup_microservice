@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../model/User');
 
 const verifyJWT = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -8,9 +9,10 @@ const verifyJWT = (req, res, next) => {
     jwt.verify(
         token,
         process.env.ACCESS_TOKEN_SECRET,
-        (err, decoded) => {
+        async(err, decoded) => {
             if (err) return res.sendStatus(403); //invalid token
-            req.user = decoded.email;
+            req.user = await User.findOne({email:decoded.email}).exec();
+            console.log("in verify JWT",req.user)
             next();
         }
     );

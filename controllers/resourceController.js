@@ -2,8 +2,27 @@ const Resource = require('../model/Resource');
 const EncryptedPassword =  require('../model/EncryptedPassword')
 
 const getAllResources = async(req, res) => {
-    const result = await Resource.find({}).exec();
-    res.status(201).json({ status: 'Success', payload: result });
+    
+    const resourceData = await Resource.find({createdBy:req.user._id}).exec();
+    const encryptedPassword = await EncryptedPassword.find({userId:req.user._id})
+    
+    let resource = [];
+    resource = resourceData.map(obj => {
+        const index = encryptedPassword.findIndex(el => el["credentialId"].toString() == obj["_id"].toString());
+        const { password } = index !== -1 ? encryptedPassword[index] : {};
+        let result = {
+            "name": obj.name,
+            "username": obj.username,
+            "password":password,
+            "url": obj.url,
+            "createdBy": obj.createdBy,
+            "dateTime": obj.dateTime,
+        }
+        return result;
+    });
+    
+    // console.log(mergeArrays(arr1, arr2));
+    res.status(201).json({ status: 'Success', payload: resource });
 }
 
 const createResource = async (req, res) => {
@@ -13,12 +32,13 @@ const createResource = async (req, res) => {
 
         let result = await Resource.create({
             "name": req.body.name,
-            "createdBy": req.body.createdBy,
+            "username":req.body.username,
+            "createdBy": req.user._id,
             "url": req.body.url
         });
     
         const password = await EncryptedPassword.create({
-            "userId": req.body.createdBy,
+            "userId": req.user._id,
             "credentialId": result._id,
             "password": req.body.password
 
@@ -30,6 +50,7 @@ const createResource = async (req, res) => {
             "createdBy": result.createdBy,
             "_id": result._id,
             "dateTime": result.dateTime,
+            "username":result.username,
             "password": password.password
         }
        
@@ -49,10 +70,11 @@ const createResource = async (req, res) => {
 
 function validateResource(data){
     if (!data.name) return { status: 'Failed', message: 'Name is required' };
+    if (!(validateUrl(data.url))) return { status: 'Failed', message: 'URL not found or invalid ' };        
+    if (!data.username) return { status: 'Failed', message: 'Username is required' };
     if (!data.password) return { status: 'Failed', message: 'password is required' };
-    if (!data.createdBy) return { status: 'Failed', message: 'createdByis required' };
-    if (!(validateUrl(data.url))) return { status: 'Failed', message: 'URL not found or invalid ' };
     return { status:'success'}
+
 }
 
 function validateUrl(string){

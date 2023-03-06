@@ -6,6 +6,10 @@ const resourceSchema = new Schema({
         type: String,
         required: true
     },
+    username: {
+        type: String,
+        required: true
+    },
     dateTime: {
         type: Date,
         default: Date.now,
