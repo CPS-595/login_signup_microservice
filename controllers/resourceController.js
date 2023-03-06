@@ -10,7 +10,7 @@ const getAllResources = async(req, res) => {
     resource = resourceData.map(obj => {
         const index = encryptedPassword.findIndex(el => el["credentialId"].toString() == obj["_id"].toString());
         const { password } = index !== -1 ? encryptedPassword[index] : {};
-        let result = {
+        return {
             "name": obj.name,
             "username": obj.username,
             "password":password,
@@ -18,10 +18,8 @@ const getAllResources = async(req, res) => {
             "createdBy": obj.createdBy,
             "dateTime": obj.dateTime,
         }
-        return result;
     });
     
-    // console.log(mergeArrays(arr1, arr2));
     res.status(201).json({ status: 'Success', payload: resource });
 }
 
