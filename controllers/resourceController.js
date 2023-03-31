@@ -17,6 +17,7 @@ const getAllResources = async(req, res) => {
             "url": obj.url,
             "createdBy": obj.createdBy,
             "dateTime": obj.dateTime,
+            "id":obj._id
         }
     });
     
