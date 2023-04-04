@@ -24,6 +24,10 @@ const userSchema = new Schema({
     number: {
         type: String,
         required: true
+    },
+    publicKey: {
+        type: String,
+        required: false
     }
 });
 

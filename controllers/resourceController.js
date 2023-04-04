@@ -21,7 +21,7 @@ const getAllResources = async(req, res) => {
         }
     });
     
-    res.status(201).json({ status: 'Success', payload: resource });
+    return res.status(200).json({ status: 'Success', payload: resource });
 }
 
 const createResource = async (req, res) => {
