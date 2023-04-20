@@ -10,7 +10,7 @@ const getAllUsers = async(req, res) => {
                 "id":obj._id,
                 "name": obj.name,
                 "email": obj.email,
-                "publickey":obj.publickey
+                "publicKey":obj.publicKey
             })
         }
     });
@@ -20,6 +20,7 @@ const getAllUsers = async(req, res) => {
 }
 
 const storePublicKey = (req, res) => {
+    console.log("body", req.body)
     const publicKey = req.body.publicKey;
     var query = { _id : req.user._id};
     User.findOneAndUpdate(query, {publicKey: publicKey}, {upsert: true}, function(err, result) {
