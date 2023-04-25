@@ -3,23 +3,41 @@ const EncryptedPassword =  require('../model/EncryptedPassword')
 
 const getAllResources = async(req, res) => {
     
-    const resourceData = await Resource.find({createdBy:req.user._id}).exec();
+    const resourceData = await Resource.find({}).exec();
     const encryptedPassword = await EncryptedPassword.find({userId:req.user._id})
-    
+    console.log("resourceData", resourceData);
+    console.log("encryptedPassword", encryptedPassword);
     let resource = [];
-    resource = resourceData.map(obj => {
-        const index = encryptedPassword.findIndex(el => el["credentialId"].toString() == obj["_id"].toString());
-        const { password } = index !== -1 ? encryptedPassword[index] : {};
-        return {
-            "name": obj.name,
-            "username": obj.username,
-            "password":password,
-            "url": obj.url,
-            "createdBy": obj.createdBy,
-            "dateTime": obj.dateTime,
-            "id":obj._id
+    resource = encryptedPassword.map(obj => {
+        const index = resourceData.findIndex(el => el["_id"].toString() == obj["credentialId"].toString());
+        // const { password } = index !== -1 ? encryptedPassword[index] : {};
+        if (index !== -1) {
+            return {
+                "name": resourceData[index].name,
+                "username": resourceData[index].username,
+                "password": obj.password,
+                "url": resourceData[index].url,
+                "createdBy": resourceData[index].createdBy,
+                "dateTime": resourceData[index].dateTime,
+                "id": resourceData[index]._id
+            }
         }
     });
+    // resource = resourceData.map(obj => {
+    //     const index = encryptedPassword.findIndex(el => el["credentialId"].toString() == obj["_id"].toString());
+    //     const { password } = index !== -1 ? encryptedPassword[index] : {};
+    //     if (index !== -1) {
+    //         return {
+    //             "name": obj.name,
+    //             "username": obj.username,
+    //             "password":password,
+    //             "url": obj.url,
+    //             "createdBy": obj.createdBy,
+    //             "dateTime": obj.dateTime,
+    //             "id":obj._id
+    //         }
+    //     }
+    // });
     
     return res.status(200).json({ status: 'Success', payload: resource });
 }
