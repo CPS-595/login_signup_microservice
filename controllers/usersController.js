@@ -45,16 +45,18 @@ const storeCredential = async (req,res) => {
 
     const checkResource = validateResource(req.body);
     if (checkResource.status === "success") {
-
-        EncryptedPassword.create({
-            "userId": req.body.userId,
-            "credentialId": req.body.credentialId,
-            "password": req.body.password,
-        }, function(err, result) {
-            console.log("result", result)
-            if (err) return res.status(400).json({status: "Failed", error: err});
-            return res.status(201).json({ status: 'Success', payload: result });
-        })
+        const result =  await EncryptedPassword.find({userId: req.body.userId, credentialId: req.body.credentialId}).exec();
+        if (result.length === 0) {
+            EncryptedPassword.create({
+                "userId": req.body.userId,
+                "credentialId": req.body.credentialId,
+                "password": req.body.password,
+            }, function(err, result) {
+                console.log("result", result)
+                if (err) return res.status(400).json({status: "Failed", error: err});
+            })
+        }
+        return res.status(201).json({ status: 'Success', payload: "Shared successfully!" });
     }
     else {
         return res.status(400).json(checkResource);
