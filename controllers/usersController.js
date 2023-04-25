@@ -45,8 +45,9 @@ const storeCredential = async (req,res) => {
 
     const checkResource = validateResource(req.body);
     if (checkResource.status === "success") {
-        const result =  await EncryptedPassword.find({userId: req.body.userId, credentialId: req.body.credentialId}).exec();
-        if (result.length === 0) {
+        const result =  await EncryptedPassword.findOne({userId: req.body.userId, credentialId: req.body.credentialId}).exec();
+        console.log("result", result)
+        if (!result) {
             EncryptedPassword.create({
                 "userId": req.body.userId,
                 "credentialId": req.body.credentialId,
